@@ -174,9 +174,66 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <blockquote>
-<p>测试图片<br><img src="http://q9lsbkjs3.bkt.clouddn.com/mem_zhizhen.png" alt=""></p>
+        <ol>
+<li>内存常见错误及对策</li>
+</ol>
+<blockquote>
+<p>(1)用malloc或new来申请内存，应该用if (p == NULL) 或if (p != NULL)进行防错处理。</p>
 </blockquote>
+<blockquote>
+<p>(2)动态内存申请后，先统一初始化(内存的缺省初值不一定为0)。</p>
+</blockquote>
+<blockquote>
+<p>(3)动态申请的内存，用完后需要释放，否则会造成内存泄漏。</p>
+</blockquote>
+<blockquote>
+<p>(4)内存释放后，不能再对其继续使用。<br>下面三种情况是内存释放后仍然对其使用了</p>
+</blockquote>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">（<span class="number">1</span>）程序中的对象调用关系过于复杂，实在难以搞清楚某个对象究竟是否已经释放了内存，此时应该重新设计数据结构，从根本上解决对象管理的混乱局面。</span><br><span class="line">（<span class="number">2</span>）函数的 <span class="keyword">return</span>语句写错了，注意不要返回指向“栈内存”的“指针”或者“引</span><br><span class="line">用”，因为该内存在函数体结束时被自动销毁。</span><br><span class="line">（<span class="number">3</span>）使用 free或 delete释放了内存后，没有将指针设置为 <span class="literal">NULL</span>。导致产生“野指针”。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<ol start="2">
+<li>内存释放</li>
+</ol>
+<p><strong>(1)free和delete</strong></p>
+<p>它们只是把指针所指的内存给释放掉，但并没有把指针本身干掉。指针p被 free以后其地址仍然不变（非 NULL），只是该地址对应的内存是垃圾，p成了“野指针”。如果此时不把 p设置为 NULL，会让人误以为 p是个合法的指针。</p>
+<ul>
+<li>如以下示例:</li>
+</ul>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> main()</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">char</span> *p = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">	p = (<span class="keyword">char</span> *)malloc(<span class="number">100</span> * <span class="keyword">sizeof</span>(<span class="keyword">char</span>));</span><br><span class="line">	strcpy(p, <span class="string">"hello"</span>);</span><br><span class="line">	printf(<span class="string">"%s\n"</span>, p);</span><br><span class="line">	printf(<span class="string">"p addr=0x%p\n"</span>, p);</span><br><span class="line">	free(p);</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">if</span> (p != <span class="literal">NULL</span>) &#123;</span><br><span class="line">		printf(<span class="string">"after free p, p is not null\n"</span>);</span><br><span class="line">		printf(<span class="string">"p addr=0x%p\n"</span>, p);</span><br><span class="line">		printf(<span class="string">"%s\n"</span>, p);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	p = <span class="literal">NULL</span>;</span><br><span class="line">	printf(<span class="string">"p addr=0x%p\n"</span>, p);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;			</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<ul>
+<li>运行结果</li>
+</ul>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">hello</span><br><span class="line">p addr=<span class="number">0x0000000000AD13E0</span></span><br><span class="line">after free p, p is not null</span><br><span class="line">p addr=<span class="number">0x0000000000AD13E0</span></span><br><span class="line">pq?</span><br><span class="line">p addr=<span class="number">0x0000000000000000</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>(2)动态内存不会自动释放</strong><br>函数体内的局部变量在函数结束时自动消亡,但是函数体内申请的动态内存不会</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> func(<span class="keyword">void</span>)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">char</span> *p = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">	p = (<span class="keyword">char</span> *)malloc(<span class="number">100</span> * <span class="keyword">sizeof</span>(<span class="keyword">char</span>));</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>函数退出时,指针p会消亡,但是动态内存还在,即以后再申请内存时,这片内存是被占用的,申请不到这片内存</p>
+<ul>
+<li>内存释放小结</li>
+</ul>
+<p>(1)指针消亡了，并不表示它所指的内存会被自动释放。<br>(2)内存被释放了,并不表示指针会消亡或者成了NULL指针(free或delete)。</p>
+<ol start="3">
+<li>指针参数传递内存地址</li>
+</ol>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> GetMemory1(<span class="keyword">char</span> *p, <span class="keyword">int</span> num)</span><br><span class="line">&#123;</span><br><span class="line">	p = (<span class="keyword">char</span> *)malloc(<span class="keyword">sizeof</span>(<span class="keyword">char</span>) * num);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> test1(<span class="keyword">void</span>)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">char</span> *str = <span class="literal">NULL</span>;</span><br><span class="line">	GetMemory1(str, <span class="number">100</span>);</span><br><span class="line">	printf(<span class="string">"str addr=%p\n"</span>, str);<span class="comment">//地址仍为0 </span></span><br><span class="line">	strcpy(str, <span class="string">"test"</span>);<span class="comment">//程序会崩溃 </span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>GetMemory1中。编译器总是要为函数的每个参数制作临时副本，指针参数p的副本是 _p，编译器使 _p = p。如果函数体内的程序修改了_p的内容，就导致参数p的内容作相应的修改。这就是指针可以用作输出参数的原因。在本例中，_p申请了新的内存，只是把_p所指的内存地址改变了，但是 p丝毫未变。所以函数GetMemory1并不能输出任何东西。事实上，每执行一次 Get Memory 就会泄露一块内存，因为没有用 free释放内存。</p>
+</blockquote>
+<p><strong>解决方法1:使用二级指针</strong></p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> GetMemory(<span class="keyword">char</span> **p, <span class="keyword">int</span> num)</span><br><span class="line">&#123;</span><br><span class="line">	printf(<span class="string">"p addr=0x%p\n"</span>, p);</span><br><span class="line">	printf(<span class="string">"*p addr=0x%p\n"</span>, *p);</span><br><span class="line">	</span><br><span class="line">	printf(<span class="string">"call malloc\n"</span>);</span><br><span class="line">	*p = (<span class="keyword">char</span> *)malloc(<span class="keyword">sizeof</span>(<span class="keyword">char</span>) * num);</span><br><span class="line">	printf(<span class="string">"p addr=0x%p\n"</span>, p);</span><br><span class="line">	printf(<span class="string">"*p addr=0x%p\n"</span>, *p);	</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> main()</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">char</span> *str = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">	printf(<span class="string">"&amp;str addr=0x%x\n"</span>, &amp;str);</span><br><span class="line">	printf(<span class="string">"str addr=0x%p\n"</span>, str);</span><br><span class="line">	GetMemory(&amp;str, <span class="number">20</span>);</span><br><span class="line">	printf(<span class="string">"&amp;str addr=0x%x\n"</span>, &amp;str);</span><br><span class="line">	printf(<span class="string">"str addr=0x%p\n"</span>, str);</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>&amp;str addr=0x62fe18<br>str addr=0x0000000000000000<br>p addr=0x000000000062FE18<br>*p addr=0x0000000000000000<br>call malloc<br>p addr=0x000000000062FE18<br>*p addr=0x0000000000BA1400<br>&amp;str addr=0x62fe18<br>str addr=0x0000000000BA1400</p>
+<p><img src="http://q9lsbkjs3.bkt.clouddn.com/mem_zhizhen.png" alt=""></p>
+<p><strong>解决方法2:用函数返回值来传递动态内存</strong></p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> *GetMemory2(<span class="keyword">char</span> *p, <span class="keyword">int</span> num)</span><br><span class="line">&#123;</span><br><span class="line">	p = (<span class="keyword">char</span> *)malloc(<span class="keyword">sizeof</span>(<span class="keyword">char</span>) * num);</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> test2(<span class="keyword">void</span>)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">char</span> *str = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">	str = GetMemory2(str, <span class="number">100</span>);</span><br><span class="line">	printf(<span class="string">"str addr=%p\n"</span>, str);</span><br><span class="line">	strcpy(str, <span class="string">"test"</span>);</span><br><span class="line">	printf(<span class="string">"%s\n"</span>, str);</span><br><span class="line">	</span><br><span class="line">	free(str);</span><br><span class="line">	str = <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
       
 
@@ -185,6 +242,17 @@
     <div class="article-info article-info-index">
       
       
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">c基础知识</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
       
 
       
@@ -487,11 +555,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">文学阅读</a>
+                <a href="javascript:void(0)" class="js-tag color1">c基础知识</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">c基础知识</a>
+                <a href="javascript:void(0)" class="js-tag color5">文学阅读</a>
               </li>
             
             <div class="clearfix"></div>
