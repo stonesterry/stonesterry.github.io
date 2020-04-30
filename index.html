@@ -177,8 +177,7 @@
         <blockquote>
 <p>参考《c语言深度剖析》&amp;《高质量c++/c编程指南》</p>
 </blockquote>
-<p>##1.内存常见错误及对策</p>
-<blockquote>
+<h1 id="1-内存常见错误及对策"><a href="#1-内存常见错误及对策" class="headerlink" title="1.内存常见错误及对策"></a>1.内存常见错误及对策</h1><blockquote>
 <p>(1)用malloc或new来申请内存，应该用if (p == NULL) 或if (p != NULL)进行防错处理。</p>
 </blockquote>
 <blockquote>
@@ -199,7 +198,6 @@
 <li>如以下示例:</li>
 </ul>
 <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> main()</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">char</span> *p = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">	p = (<span class="keyword">char</span> *)malloc(<span class="number">100</span> * <span class="keyword">sizeof</span>(<span class="keyword">char</span>));</span><br><span class="line">	strcpy(p, <span class="string">"hello"</span>);</span><br><span class="line">	printf(<span class="string">"%s\n"</span>, p);</span><br><span class="line">	printf(<span class="string">"p addr=0x%p\n"</span>, p);</span><br><span class="line">	free(p);</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">if</span> (p != <span class="literal">NULL</span>) &#123;</span><br><span class="line">		printf(<span class="string">"after free p, p is not null\n"</span>);</span><br><span class="line">		printf(<span class="string">"p addr=0x%p\n"</span>, p);</span><br><span class="line">		printf(<span class="string">"%s\n"</span>, p);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	p = <span class="literal">NULL</span>;</span><br><span class="line">	printf(<span class="string">"p addr=0x%p\n"</span>, p);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;			</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
 
 
 <ul>
