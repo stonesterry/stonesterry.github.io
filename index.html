@@ -177,7 +177,7 @@
         <blockquote>
 <p>参考《c语言深度剖析》&amp;《高质量c++/c编程指南》</p>
 </blockquote>
-<p>#1.内存常见错误及对策#</p>
+<p>##1.内存常见错误及对策</p>
 <blockquote>
 <p>(1)用malloc或new来申请内存，应该用if (p == NULL) 或if (p != NULL)进行防错处理。</p>
 </blockquote>
@@ -207,7 +207,9 @@
 </ul>
 <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">hello</span><br><span class="line">p addr=<span class="number">0x0000000000AD13E0</span></span><br><span class="line">after free p, p is not null</span><br><span class="line">p addr=<span class="number">0x0000000000AD13E0</span></span><br><span class="line">pq?</span><br><span class="line">p addr=<span class="number">0x0000000000000000</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<p><strong>(2)动态内存不会自动释放</strong><br>函数体内的局部变量在函数结束时自动消亡,但是函数体内申请的动态内存不会</p>
+
+<p><strong>(2)动态内存不会自动释放</strong></p>
+<p>函数体内的局部变量在函数结束时自动消亡,但是函数体内申请的动态内存不会</p>
 <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> func(<span class="keyword">void</span>)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">char</span> *p = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">	p = (<span class="keyword">char</span> *)malloc(<span class="number">100</span> * <span class="keyword">sizeof</span>(<span class="keyword">char</span>));</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p>函数退出时,指针p会消亡,但是动态内存还在,即以后再申请内存时,这片内存是被占用的,如果再申请是申请不到这片内存的。</p>
@@ -552,11 +554,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">文学阅读</a>
+                <a href="javascript:void(0)" class="js-tag color1">c基础知识</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">c基础知识</a>
+                <a href="javascript:void(0)" class="js-tag color5">文学阅读</a>
               </li>
             
             <div class="clearfix"></div>
