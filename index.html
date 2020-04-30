@@ -174,9 +174,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <blockquote>
-<p>参考《c语言深度剖析》&amp;《高质量c++/c编程指南》</p>
-</blockquote>
+        <p>对c语言中内存使用管理进行分析</p>
         
           <a class="article-more-a" href="/2020/04/30/c-memory/#more">more >></a>
         
@@ -252,16 +250,10 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <blockquote>
-<p>自序里面提到“人是为活着本身而活着的，而不是为了活着之外的任何事物所活着”,自己对这句话没有理解到，为什么不是为了活着之外的事物所活着呢？人生理想，金钱，权力等都可以是之外的事物，而如果我们不追求这些又有什么意义呢？即使是“采菊东篱下”，也是为了追求一种恬然的境界。</p>
-</blockquote>
-<blockquote>
-<p>读完本书之后觉得与三观卖血相比,确实显得很悲情，生命渺小，人生无常。平时需要多锻炼身体，珍惜眼前人。</p>
-</blockquote>
-<blockquote>
-<p>“我看到广阔的土地袒露着结实的胸膛，那是召唤的姿态，就像女人召唤着她们的儿女，土地召唤黑夜降临”，让我想起小时候的一些场景，夏天里，黄昏时刻，黑夜即将到来，乡下的田野路上，蟋蟀声， 蛙叫声等声叫已经此起彼伏了，农忙人也停止了在田里的耕种，开始相互寒暄今日的劳作情况。有的人把牛拉到河边让其洗澡，或给它们喂草以犒劳其辛勤劳动。<br>远处屋顶的炊烟已袅袅升起，远处传来呼喊声，呼喊着还在田埂上追逐跑跳的孩童回家吃饭。渐渐地，黑夜彻底降临，天上的月亮却显得格外明亮，远处人家的灯也亮了起来……</p>
-</blockquote>
-
+        <p>阅读《活着》</p>
+        
+          <a class="article-more-a" href="/2020/04/29/huozhe/#more">more >></a>
+        
       
 
       
@@ -334,27 +326,10 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h1><p>通过结构体变量的某个成员的地址来获取整个结构体的首地址</p>
-<h1 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h1><p>以linux4.19的container_of为例</p>
-<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * container_of - cast a member of a structure out to the containing structure</span></span><br><span class="line"><span class="comment"> * @ptr:	the pointer to the member.</span></span><br><span class="line"><span class="comment"> * @type:	the type of the container struct this is embedded in.</span></span><br><span class="line"><span class="comment"> * @member:	the name of the member within the struct.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> container_of(ptr, type, member) (&#123;				\</span></span><br><span class="line">	<span class="keyword">void</span> *__mptr = (<span class="keyword">void</span> *)(ptr);					\</span><br><span class="line">	BUILD_BUG_ON_MSG(!__same_type(*(ptr), ((type *)<span class="number">0</span>)-&gt;member) &amp;&amp;	\</span><br><span class="line">			 !__same_type(*(ptr), <span class="keyword">void</span>),			\</span><br><span class="line">			 <span class="string">"pointer type mismatch in container_of()"</span>);	\</span><br><span class="line">	((type *)(__mptr - offsetof(type, member))); &#125;)</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> offsetof(TYPE, MEMBER)	((size_t)&amp;((TYPE *)0)-&gt;MEMBER)</span></span><br></pre></td></tr></table></figure>
-
-
-
-<blockquote>
-<p>ptr:指向结构体member成员的指针<br>type:member成员所在结构体的数据类型<br>member:结构体成员为member的变量</p>
-</blockquote>
-<ul>
-<li>首先定义了一个(void *)的指针__mptr，指向ptr</li>
-<li>BUILD_BUG_ON_MSG的作用是做防御性的判断，判断类型是否一致，若不一致则会报错</li>
-<li>((type *)(__mptr - offsetof(type, member)))这是整个container_of的核心,即得到结构体的首地址，对offsetof(type, member)进行展开<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> offsetof(TYPE, MEMBER)	((size_t)&amp;((TYPE *)0)-&gt;MEMBER)</span></span><br><span class="line">&amp;((TYPE *)<span class="number">0</span>)-&gt;MEMBER:将<span class="number">0</span>地址转换为TYPE型的，然后取出其MEMBER成员的地址。换句话说得到MEMBER成员相对于结构体首地址的相对偏移量，再用__mptr减去这个相对偏移地址即得到结构体的首地址了。</span><br><span class="line"></span><br><span class="line">需要说明一点的是__mptr变量的结构类型为(<span class="keyword">void</span> *)是有特殊含义的,我们知道指针变量进行加减运算时，实际上加减n*<span class="keyword">sizeof</span>(指针类型)。</span><br><span class="line">如<span class="keyword">int</span> *p;</span><br><span class="line">p++实际上等于p+<span class="keyword">sizeof</span>(<span class="keyword">int</span>)</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><ul>
-<li>源码<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> test_container_of&#123;</span><br><span class="line">	<span class="keyword">char</span> a;</span><br><span class="line">	<span class="keyword">int</span> b;</span><br><span class="line">	<span class="keyword">double</span> c;</span><br><span class="line">&#125;tag_test_container_of;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> main()</span><br><span class="line">&#123;</span><br><span class="line">	tag_test_container_of 	test_var;</span><br><span class="line"></span><br><span class="line">	printf(<span class="string">"test_var addr=  0x%p\n"</span>, &amp;test_var);</span><br><span class="line">	printf(<span class="string">"test_var.c addr=0x%p\n"</span>, &amp;test_var.c);</span><br><span class="line">	</span><br><span class="line">	printf(<span class="string">"offset c in tag_test_container_of is %d\n"</span>, (<span class="keyword">long</span> <span class="keyword">long</span>)(&amp;(((tag_test_container_of*)<span class="number">0</span>)-&gt;c)));</span><br><span class="line">	printf(<span class="string">"addr test_var.c - offset c in tag_test_container_of = 0x%x\n"</span>, (&amp;test_var.c) -</span><br><span class="line">											(<span class="keyword">int</span>)(&amp;(((tag_test_container_of*)<span class="number">0</span>)-&gt;c)));</span><br><span class="line"></span><br><span class="line">	printf(<span class="string">"addr test_var.c - offset c in tag_test_container_of = 0x%x\n"</span>, (<span class="keyword">void</span> *)(&amp;test_var.c) -</span><br><span class="line">											(<span class="keyword">char</span>)(&amp;(((tag_test_container_of*)<span class="number">0</span>)-&gt;c)));</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure></li>
-<li>结果<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">test_var addr=  <span class="number">0x000000000062FE10</span></span><br><span class="line">test_var.c addr=<span class="number">0x000000000062FE18</span></span><br><span class="line">offset c <span class="keyword">in</span> tag_test_container_of is <span class="number">8</span></span><br><span class="line">addr test_var.c - offset c <span class="keyword">in</span> tag_test_container_of(type=<span class="keyword">int</span>) = <span class="number">0x62fdd8</span>   (<span class="number">0x000000000062FE18</span><span class="number">-8</span>*<span class="keyword">sizeof</span>(<span class="keyword">int</span>))</span><br><span class="line">addr test_var.c - offset c <span class="keyword">in</span> tag_test_container_of(type=<span class="keyword">char</span>) = <span class="number">0x62fe10</span>  (<span class="number">0x000000000062FE18</span><span class="number">-8</span>*<span class="keyword">sizeof</span>(<span class="keyword">char</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 0x62fdd8 =  (0x000000000062FE18-8*sizeof(int)) */</span></span><br><span class="line"><span class="comment">/* 0x62fe10 =  (0x000000000062FE18-8*sizeof(char)) */</span></span><br></pre></td></tr></table></figure></li>
-</ul>
-
+        <p>对linux中container_of这个宏进行分析</p>
+        
+          <a class="article-more-a" href="/2020/04/29/c-container-of/#more">more >></a>
+        
       
 
       
@@ -500,11 +475,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">c基础知识</a>
+                <a href="javascript:void(0)" class="js-tag color5">文学阅读</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">文学阅读</a>
+                <a href="javascript:void(0)" class="js-tag color1">c基础知识</a>
               </li>
             
             <div class="clearfix"></div>
