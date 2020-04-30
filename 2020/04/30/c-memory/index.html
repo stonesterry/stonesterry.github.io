@@ -17,7 +17,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://q9lsbkjs3.bkt.clouddn.com/mem_zhizhen.png">
 <meta property="article:published_time" content="2020-04-30T12:58:23.000Z">
-<meta property="article:modified_time" content="2020-04-30T14:27:24.955Z">
+<meta property="article:modified_time" content="2020-04-30T14:31:46.239Z">
 <meta property="article:author" content="stonesterry">
 <meta property="article:tag" content="c基础知识">
 <meta name="twitter:card" content="summary">
@@ -195,6 +195,8 @@
 <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">（<span class="number">1</span>）程序中的对象调用关系过于复杂，实在难以搞清楚某个对象究竟是否已经释放了内存，此时应该重新设计数据结构，从根本上解决对象管理的混乱局面。</span><br><span class="line">（<span class="number">2</span>）函数的 <span class="keyword">return</span>语句写错了，注意不要返回指向“栈内存”的“指针”或者“引用”，因为该内存在函数体结束时被自动销毁。</span><br><span class="line">（<span class="number">3</span>）使用 free或 delete释放了内存后，没有将指针设置为 <span class="literal">NULL</span>。导致产生“野指针”。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 
+
+
 <ol start="2">
 <li>内存释放</li>
 </ol>
@@ -217,8 +219,10 @@
 <p><strong>(2)动态内存不会自动释放</strong><br>函数体内的局部变量在函数结束时自动消亡,但是函数体内申请的动态内存不会</p>
 <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> func(<span class="keyword">void</span>)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">char</span> *p = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">	p = (<span class="keyword">char</span> *)malloc(<span class="number">100</span> * <span class="keyword">sizeof</span>(<span class="keyword">char</span>));</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<p>函数退出时,指针p会消亡,但是动态内存还在,即以后再申请内存时,这片内存是被占用的,申请不到这片内存</p>
-<p><strong>- 内存释放小结</strong></p>
+<p>函数退出时,指针p会消亡,但是动态内存还在,即以后再申请内存时,这片内存是被占用的,如果再申请是申请不到这片内存的。</p>
+<ul>
+<li><strong>内存释放小结</strong></li>
+</ul>
 <p>(1)指针消亡了，并不表示它所指的内存会被自动释放。<br>(2)内存被释放了,并不表示指针会消亡或者成了NULL指针(free或delete)。</p>
 <ol start="3">
 <li>指针参数传递内存地址</li>
@@ -235,7 +239,7 @@
 
 </li>
 </ul>
-<p><img src="http://q9lsbkjs3.bkt.clouddn.com/mem_zhizhen.png" alt=""></p>
+<p>下图是对二级指针malloc前后的地址进行分析<br><img src="http://q9lsbkjs3.bkt.clouddn.com/mem_zhizhen.png" alt=""></p>
 <p><strong>解决方法2:用函数返回值来传递动态内存</strong></p>
 <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> *GetMemory2(<span class="keyword">char</span> *p, <span class="keyword">int</span> num)</span><br><span class="line">&#123;</span><br><span class="line">	p = (<span class="keyword">char</span> *)malloc(<span class="keyword">sizeof</span>(<span class="keyword">char</span>) * num);</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> test2(<span class="keyword">void</span>)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">char</span> *str = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">	str = GetMemory2(str, <span class="number">100</span>);</span><br><span class="line">	printf(<span class="string">"str addr=%p\n"</span>, str);</span><br><span class="line">	strcpy(str, <span class="string">"test"</span>);</span><br><span class="line">	printf(<span class="string">"%s\n"</span>, str);</span><br><span class="line">	</span><br><span class="line">	free(str);</span><br><span class="line">	str = <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
